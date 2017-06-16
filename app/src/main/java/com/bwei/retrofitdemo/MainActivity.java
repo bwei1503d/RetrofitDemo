@@ -3,11 +3,16 @@ package com.bwei.retrofitdemo;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bwei.retrofitdemo.cookie.CookiesManager;
@@ -41,6 +46,7 @@ import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 
 import static android.R.attr.password;
+import static android.R.attr.path;
 import static android.R.attr.type;
 
 public class MainActivity extends Activity {
@@ -56,6 +62,17 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
 
+
+        String content = "1234567890" ;
+
+        SpannableString spannableString = new SpannableString(content);
+
+        spannableString.setSpan(new BackgroundColorSpan(Color.GRAY),6,10, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+
+
+        EditText editText = (EditText) findViewById(R.id.edit);
+
+        editText.setText(spannableString);
 
         findViewById(R.id.get_id).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,7 +107,7 @@ public class MainActivity extends Activity {
                 //主域名
                 .baseUrl("http://www.2dyt.com/")
                 //返回的内容  用Gson 转化bean
-                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
                 // 改变回调的线程
 //                .callbackExecutor(exe)
 //                .callFactory(client)
@@ -102,7 +119,7 @@ public class MainActivity extends Activity {
 
 
         //动态代理
-        LoginService loginService =  retrofit.create(LoginService.class);
+        final LoginService loginService =  retrofit.create(LoginService.class);
 
 //        loginService.getLogin().enqueue(new Callback<LoginBean>() {
 //            @Override
@@ -134,7 +151,7 @@ public class MainActivity extends Activity {
 
 //        public Call<LoginBean> getLoginMap(@QueryMap Map<String,String> map);
 
-        Map map = new HashMap();
+        final Map map = new HashMap();
         map.put("username","11111111111");
         map.put("password","1");
         map.put("postkey","1503d");
@@ -235,33 +252,118 @@ public class MainActivity extends Activity {
 //        });
 
 
+        loginService.loginUrl("http://qhb.2dyt.com/Bwei/login",map).enqueue(new Callback<LoginBean>() {
+            @Override
+            public void onResponse(Call<LoginBean> call, Response<LoginBean> response) {
 
-//        loginService.loginUrl("http://qhb.2dyt.com/Bwei/login",map).enqueue(new Callback<LoginBean>() {
+                System.out.println("Thread.currentThread().getName() = " + Thread.currentThread().getName());
+
+                System.out.println("response = " + response.body().getRet_msg());
+
+            }
+
+            @Override
+            public void onFailure(Call<LoginBean> call, Throwable t) {
+
+            }
+        });
+
+
+//        loginService.get("http://qhb.2dyt.com/Bwei/login",map).enqueue(new Callback<String>() {
 //            @Override
-//            public void onResponse(Call<LoginBean> call, Response<LoginBean> response) {
+//            public void onResponse(Call<String> call, Response<String> response) {
 //
-//                System.out.println("response = " + response.body().getRet_msg());
+//                System.out.println("response = " + response.body());
+//
 //            }
 //
 //            @Override
-//            public void onFailure(Call<LoginBean> call, Throwable t) {
+//            public void onFailure(Call<String> call, Throwable t) {
 //
 //            }
 //        });
 
-        loginService.get("http://qhb.2dyt.com/Bwei/login",map).enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+//
+//        final String path =  Environment.getExternalStorageDirectory() +"/aa/";
+//
+//        final String url = "http://gdown.baidu.com/data/wisegame/41a04ccb443cd61a/QQ_692.apk" ;
+//
+//
+//
+//                 loginService.downloadFile("http://gdown.baidu.com/data/wisegame/41a04ccb443cd61a/QQ_692.apk").enqueue(new Callback<ResponseBody>() {
+//                    @Override
+//                    public void onResponse(Call<ResponseBody> call,final Response<ResponseBody> response) {
+//
+//
+//                        InputStream inputStream = null;
+//                        FileOutputStream fileOutputStream = null;
+//                        File file = null ;
+//                        final String[] arrays =  url.split("/");
+//
+//                        try {
+//
+//                            long total = response.body().contentLength();
+//                            long sum = 0;
+//
+//                            inputStream = response.body().byteStream();
+//
+//                            int len = 0;
+//                            byte[] buff = new byte[1024];
+//
+//                            file = new File(path);
+//
+//                            if (!file.exists()) {
+//                                boolean result =  file.mkdirs();
+//                                System.out.println("result = " + result);
+//                            }
+//                            file = new File(file.getPath(),arrays[arrays.length - 1]);
+//                            if(file.exists()){
+//                                file.delete();
+//                            }
+//                            file.createNewFile();
+//
+//                            fileOutputStream = new FileOutputStream(file);
+//
+//                            while ((len = inputStream.read(buff)) != -1) {
+//                                fileOutputStream.write(buff, 0, len);
+//                                sum += len;
+//                                int progress = (int) (sum * 1.0f / total * 100);
+//
+//                                System.out.println("progress = " + progress);
+//                            }
+//                            fileOutputStream.flush();
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        } finally {
+//                            try {
+//                                if (inputStream != null) {
+//                                    inputStream.close();
+//                                }
+//                                if (fileOutputStream != null) {
+//                                    fileOutputStream.close();
+//                                }
+//                                inputStream = null;
+//                                fileOutputStream = null;
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//
+//
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+//
+//                    }
+//                });
 
-                System.out.println("response = " + response.body());
 
-            }
 
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
 
-            }
-        });
+
+
 
 
 

@@ -42,7 +42,7 @@ public class Test {
 
         object.kanfang(10);
 
-//        object.zufang(5);
+        object.zufang(5);
 
 
 

@@ -17,6 +17,7 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
+import retrofit2.http.Streaming;
 import retrofit2.http.Url;
 
 import static android.os.Build.VERSION_CODES.M;
@@ -105,6 +106,13 @@ public interface LoginService {
     @FormUrlEncoded
     @POST
     public Call<String> post(@Url String url,@FieldMap Map<String,String> map);
+
+
+
+    //
+    @Streaming
+    @GET
+    public Call<ResponseBody> downloadFile(@Url String url);
 
 
 
