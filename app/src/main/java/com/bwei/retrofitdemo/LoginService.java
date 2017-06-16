@@ -109,7 +109,7 @@ public interface LoginService {
 
 
 
-    //
+    // 下载
     @Streaming
     @GET
     public Call<ResponseBody> downloadFile(@Url String url);

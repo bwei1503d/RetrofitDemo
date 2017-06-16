@@ -2,6 +2,9 @@ package com.bwei.retrofitdemo;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -16,6 +19,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bwei.retrofitdemo.cookie.CookiesManager;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,6 +52,7 @@ import retrofit2.http.QueryMap;
 import static android.R.attr.password;
 import static android.R.attr.path;
 import static android.R.attr.type;
+import static android.icu.lang.UCharacter.SentenceBreak.SP;
 
 public class MainActivity extends Activity {
 
@@ -61,6 +66,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        startService(new Intent(this, MyService.class));
 
 
         String content = "1234567890" ;
@@ -78,8 +85,9 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                get();
+//                get();
 
+                CrashReport.testNativeCrash();
             }
         });
 
@@ -91,6 +99,26 @@ public class MainActivity extends Activity {
                 toPic();
             }
         });
+
+
+        ActivityInfo info= null;
+//            info = this.getPackageManager()
+//                    .getActivityInfo(getComponentName(),
+//                            PackageManager.GET_META_DATA);
+
+//            ApplicationInfo appInfo = this.getPackageManager()
+//                    .getApplicationInfo(getPackageName(),
+//                            PackageManager.GET_META_DATA);
+//
+//            String BUGLY_APPID =appInfo.metaData.getString("BUGLY_APPID");
+//            String BUGLY_APP_VERSION =appInfo.metaData.getString("BUGLY_APP_VERSION");
+//            String BUGLY_APP_CHANNEL =appInfo.metaData.getString("BUGLY_APP_CHANNEL");
+//            boolean BUGLY_ENABLE_DEBUG =appInfo.metaData.getBoolean("BUGLY_ENABLE_DEBUG");
+
+
+
+
+        startActivity(new Intent(this,SpanableActivity.class));
 
 
     }
@@ -284,80 +312,90 @@ public class MainActivity extends Activity {
 //        });
 
 //
-//        final String path =  Environment.getExternalStorageDirectory() +"/aa/";
+        final String path =  Environment.getExternalStorageDirectory() +"/aa/";
+
+        final String url = "http://gdown.baidu.com/data/wisegame/41a04ccb443cd61a/QQ_692.apk" ;
 //
-//        final String url = "http://gdown.baidu.com/data/wisegame/41a04ccb443cd61a/QQ_692.apk" ;
-//
-//
-//
-//                 loginService.downloadFile("http://gdown.baidu.com/data/wisegame/41a04ccb443cd61a/QQ_692.apk").enqueue(new Callback<ResponseBody>() {
-//                    @Override
-//                    public void onResponse(Call<ResponseBody> call,final Response<ResponseBody> response) {
-//
-//
-//                        InputStream inputStream = null;
-//                        FileOutputStream fileOutputStream = null;
-//                        File file = null ;
-//                        final String[] arrays =  url.split("/");
-//
-//                        try {
-//
-//                            long total = response.body().contentLength();
-//                            long sum = 0;
-//
-//                            inputStream = response.body().byteStream();
-//
-//                            int len = 0;
-//                            byte[] buff = new byte[1024];
-//
-//                            file = new File(path);
-//
-//                            if (!file.exists()) {
-//                                boolean result =  file.mkdirs();
-//                                System.out.println("result = " + result);
-//                            }
-//                            file = new File(file.getPath(),arrays[arrays.length - 1]);
-//                            if(file.exists()){
-//                                file.delete();
-//                            }
-//                            file.createNewFile();
-//
-//                            fileOutputStream = new FileOutputStream(file);
-//
-//                            while ((len = inputStream.read(buff)) != -1) {
-//                                fileOutputStream.write(buff, 0, len);
-//                                sum += len;
-//                                int progress = (int) (sum * 1.0f / total * 100);
-//
-//                                System.out.println("progress = " + progress);
-//                            }
-//                            fileOutputStream.flush();
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        } finally {
-//                            try {
-//                                if (inputStream != null) {
-//                                    inputStream.close();
-//                                }
-//                                if (fileOutputStream != null) {
-//                                    fileOutputStream.close();
-//                                }
-//                                inputStream = null;
-//                                fileOutputStream = null;
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                        }
-//
-//
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-//
-//                    }
-//                });
+
+
+                 loginService.downloadFile("http://gdown.baidu.com/data/wisegame/41a04ccb443cd61a/QQ_692.apk").enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call,final Response<ResponseBody> response) {
+
+
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+
+
+
+                                InputStream inputStream = null;
+                                FileOutputStream fileOutputStream = null;
+                                File file = null ;
+                                final String[] arrays =  url.split("/");
+
+                                try {
+
+                                    long total = response.body().contentLength();
+                                    long sum = 0;
+
+                                    inputStream = response.body().byteStream();
+
+                                    int len = 0;
+                                    byte[] buff = new byte[1024];
+
+                                    file = new File(path);
+
+                                    if (!file.exists()) {
+                                        boolean result =  file.mkdirs();
+                                        System.out.println("result = " + result);
+                                    }
+                                    file = new File(file.getPath(),arrays[arrays.length - 1]);
+                                    if(file.exists()){
+                                        file.delete();
+                                    }
+                                    file.createNewFile();
+
+                                    fileOutputStream = new FileOutputStream(file);
+
+                                    while ((len = inputStream.read(buff)) != -1) {
+                                        fileOutputStream.write(buff, 0, len);
+                                        sum += len;
+                                        int progress = (int) (sum * 1.0f / total * 100);
+
+                                        System.out.println("progress = " + progress);
+                                    }
+                                    fileOutputStream.flush();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    try {
+                                        if (inputStream != null) {
+                                            inputStream.close();
+                                        }
+                                        if (fileOutputStream != null) {
+                                            fileOutputStream.close();
+                                        }
+                                        inputStream = null;
+                                        fileOutputStream = null;
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }
+
+                            }
+                        }).start();
+
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
 
 
 
